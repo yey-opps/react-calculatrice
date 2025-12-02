@@ -4,76 +4,44 @@ import {
   View,
   Text,
   TextInput,
-  Pressable,
   Button,
+  Pressable,
   StyleSheet,
 } from 'react-native';
 
 export default function App() {
-  const [val1, setVal1] = useState('');
-  const [val2, setVal2] = useState('');
-  const [operator, setOperator] = useState(null); 
-  const [result, setResult] = useState(null);
+  const [v1, setV1] = useState('');
+  const [v2, setV2] = useState('');
+  const [op, setOp] = useState(null);
+  const [result, setResult] = useState('');
 
-  const handleCalculate = () => {
-    const a = parseFloat(val1);
-    const b = parseFloat(val2);
+  const calculate = () => {
+    const a = parseFloat(v1);
+    const b = parseFloat(v2);
 
-    // Vérifications de base
     if (isNaN(a) || isNaN(b)) {
-      setResult('Veuillez saisir deux nombres valides.');
+      setResult('Entrer deux nombres');
+      return;
+    }
+    if (!op) {
+      setResult('Choisir une opération');
       return;
     }
 
-    if (!operator) {
-      setResult('Veuillez choisir une opération.');
-      return;
-    }
+    let r = 0;
+    if (op === '+') r = a + b;
+    else if (op === '-') r = a - b;
+    else if (op === '*') r = a * b;
 
-    let res;
-    switch (operator) {
-      case '+':
-        res = a + b;
-        break;
-      case '-':
-        res = a - b;
-        break;
-      case '*':
-        res = a * b;
-        break;
-      default:
-        res = 'Opérateur invalide.';
-    }
-
-    setResult(String(res));
+    setResult(String(r));
   };
 
-  const handleClear = () => {
-    setVal1('');
-    setVal2('');
-    setOperator(null);
-    setResult(null);
+  const clearAll = () => {
+    setV1('');
+    setV2('');
+    setOp(null);
+    setResult('');
   };
-
-  const renderOperatorButton = (symbol) => (
-    <Pressable
-      key={symbol}
-      style={[
-        styles.opButton,
-        operator === symbol && styles.opButtonSelected,
-      ]}
-      onPress={() => setOperator(symbol)}
-    >
-      <Text
-        style={[
-          styles.opButtonText,
-          operator === symbol && styles.opButtonTextSelected,
-        ]}
-      >
-        {symbol}
-      </Text>
-    </Pressable>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,104 +51,81 @@ export default function App() {
         style={styles.input}
         placeholder="Valeur 1"
         keyboardType="numeric"
-        value={val1}
-        onChangeText={setVal1}
+        value={v1}
+        onChangeText={setV1}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Valeur 2"
         keyboardType="numeric"
-        value={val2}
-        onChangeText={setVal2}
+        value={v2}
+        onChangeText={setV2}
       />
 
-      <Text style={styles.label}>Choisir une opération :</Text>
-
-      <View style={styles.opRow}>
-        {['+', '-', '*'].map(renderOperatorButton)}
+      <View style={styles.row}>
+        {['+', '-', '*'].map(symbol => (
+          <Pressable
+            key={symbol}
+            style={[
+              styles.opBtn,
+              op === symbol && styles.opBtnSelected,
+            ]}
+            onPress={() => setOp(symbol)}
+          >
+            <Text
+              style={[
+                styles.opText,
+                op === symbol && styles.opTextSelected,
+              ]}
+            >
+              {symbol}
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
-      <View style={styles.buttonsRow}>
-        <Button title="Calculer" onPress={handleCalculate} />
-        <View style={styles.spacer} />
-        <Button title="Clear" onPress={handleClear} />
+      <View style={styles.row}>
+        <Button title="Calculer" onPress={calculate} />
+        <View style={{ width: 10 }} />
+        <Button title="Clear" onPress={clearAll} />
       </View>
 
-      <View style={styles.resultContainer}>
-        <Text style={styles.resultLabel}>Résultat :</Text>
-        <Text style={styles.resultValue}>
-          {result !== null ? result : 'Aucun calcul effectué pour le moment.'}
-        </Text>
-      </View>
+      <Text style={styles.result}>
+        {result !== '' ? `Résultat : ${result}` : 'Résultat : '}
+      </Text>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'flex-start',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 24,
-  },
+  container: { flex: 1, padding: 20, justifyContent: 'flex-start' },
+  title: { fontSize: 22, fontWeight: '600', marginBottom: 20 },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 12,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 10,
   },
-  label: {
-    marginTop: 8,
-    marginBottom: 4,
-    fontSize: 16,
-  },
-  opRow: {
+  row: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
-  opButton: {
+  opBtn: {
     borderWidth: 1,
     borderColor: '#007aff',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    marginHorizontal: 5,
   },
-  opButtonSelected: {
+  opBtnSelected: {
     backgroundColor: '#007aff',
   },
-  opButtonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#007aff',
-  },
-  opButtonTextSelected: {
-    color: '#ffffff',
-  },
-  buttonsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
-  spacer: {
-    width: 16,
-  },
-  resultContainer: {
-    marginTop: 24,
-  },
-  resultLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  resultValue: {
-    fontSize: 18,
-  },
+  opText: { fontSize: 18, color: '#007aff', fontWeight: '600' },
+  opTextSelected: { color: '#fff' },
+  result: { marginTop: 20, fontSize: 18 },
 });
